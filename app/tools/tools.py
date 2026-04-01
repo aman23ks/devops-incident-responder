@@ -12,8 +12,12 @@ load_dotenv()
 
 # ---- Clients ----
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+
+# Initialize Pinecone only if API key is present
+pc = None
 INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
+if os.getenv("PINECONE_API_KEY"):
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 
 # ---- Helpers ----
 def get_embedding(text: str, model: str = "text-embedding-3-small") -> list[float]:
@@ -112,12 +116,16 @@ def rag_retrieve(incident_id: str, log_data: str, phase_title: str, synopsis: st
     """
     step_id = record_step(incident_id, phase_title, synopsis, phase="in_progress")
     try:
+        api_key = os.getenv("PINECONE_API_KEY")
+        if not api_key or api_key == "":
+            update_step_status(step_id, "complete")
+            return "MOCK RAG: No Pinecone API key found. Proceeding with general DevOps knowledge. Suggest checking connection pools, query performance, and service inter-dependencies."
+
         index = pc.Index(INDEX_NAME)
         embedding = get_embedding(log_data)
         results = index.query(vector=embedding, top_k=3, include_metadata=True)
-
+        # ... rest of the logic ...
         docs = []
-        # pinecone-py returns an object with .matches; make it safe
         matches = getattr(results, "matches", None) or getattr(results, "get", lambda k, d=None: d)("matches", []) or []
         for m in matches:
             meta = getattr(m, "metadata", None) or m.get("metadata", {}) if isinstance(m, dict) else {}

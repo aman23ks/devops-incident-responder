@@ -1,0 +1,3 @@
+2025-09-27T15:10:00Z ERROR [db-pool] Connection pool exhausted: 100/100
+2025-09-27T15:10:05Z ERROR [checkout] Timeout after 5000ms while acquiring connection
+2025-09-27T15:10:10Z ERROR [checkout] Database connection failed for user_id=USR-1234

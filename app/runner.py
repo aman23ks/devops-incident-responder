@@ -5,42 +5,36 @@ from app.db.dal import (
     record_step, save_report
 )
 
+import json
+from app.agents.agent import run_agent
+
 POLL_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL_SECONDS", "10"))
 
 def process_incident(inc: dict):
     iid = inc["id"]
     try:
         mark_in_progress(iid)
-        record_step(iid, "collector", "start", "Starting collection", status="STARTED")
-
-        # TODO: your real collection here
-        # e.g., choose folders, fetch logs...
-        record_step(iid, "collector", "retrieve", "Selected folders & fetched logs", status="OK")
-
-        # TODO: your real analysis here (RAG/LLM)
-        rca = {
-            "issue": "Demo issue",
-            "root_cause": "Demo root cause",
-            "mitigations": [{"action": "Demo mitigation"}],
-            "confidence": 0.9,
+        
+        # Prepare the incident context for the agent
+        incident_data = {
+            "incident_id": iid,
+            "service": inc.get("service"),
+            "environment": inc.get("environment"),
+            "severity": inc.get("severity"),
+            "payload": json.loads(inc.get("payload_json", "{}"))
         }
-        record_step(iid, "analyst", "summarize", "Drafted RCA", {"issue": rca["issue"]}, status="OK")
-
-        report_md = f"""# Incident {iid} — RCA
-
-**Issue:** {rca['issue']}
-**Root cause:** {rca['root_cause']}
-**Confidence:** {rca['confidence']}
-
-## Suggested mitigations
-- {rca['mitigations'][0]['action']}
-"""
-        save_report(iid, rca, report_md)
-
-        record_step(iid, "supervisor", "done", "Incident processed", status="OK")
+        
+        print(f"[runner] starting agent for incident {iid}...")
+        # run_agent handles the step recording and report saving via its tools
+        run_agent(json.dumps(incident_data, indent=2))
+        
         mark_done(iid)
+        print(f"[runner] incident {iid} completed successfully.")
+        
     except Exception as e:
-        record_step(iid, "supervisor", "error", f"{e}", {"trace": traceback.format_exc()}, status="ERROR")
+        print(f"[runner] incident {iid} failed: {e}")
+        traceback.print_exc()
+        record_step(iid, "Agent Error", str(e), phase="error")
         mark_failed(iid)
 
 def main():

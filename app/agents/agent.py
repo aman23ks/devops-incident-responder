@@ -2,6 +2,7 @@ from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from app.prompts.prompts import SYSTEM_PROMPT
 from app.tools.tools import fetch_log_file, rag_retrieve, store_final_report
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -9,7 +10,8 @@ load_dotenv()
 tools = [fetch_log_file, rag_retrieve, store_final_report]
 
 # Model
-model = ChatOpenAI(model="gpt-4o", temperature=0)
+model_name = os.getenv("LLM_MODEL", "gpt-4o-mini")
+model = ChatOpenAI(model=model_name, temperature=0)
 
 # Agent
 agent = create_react_agent(

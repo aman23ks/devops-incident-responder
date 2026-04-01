@@ -32,16 +32,21 @@ incidents = [
     }
 ]
 
+import sqlite3
+
 if __name__ == "__main__":
     for inc in incidents:
-        incident_id = record_incident(
-            incident_id=inc["incident_id"],
-            status=inc["status"],
-            service=inc["service"],
-            environment=inc["environment"],
-            severity=inc["severity"],
-            payload=inc["payload"],
-            created_at=inc["created_at"]
-        )
-        print(f"✅ Inserted incident with id={incident_id}")
-        time.sleep(30)  # wait 30 seconds before next insert
+        try:
+            incident_id = record_incident(
+                incident_id=inc["incident_id"],
+                status=inc["status"],
+                service=inc["service"],
+                environment=inc["environment"],
+                severity=inc["severity"],
+                payload=inc["payload"],
+                created_at=inc["created_at"]
+            )
+            print(f"✅ Inserted incident with id={incident_id}")
+            time.sleep(5)  # wait 5 seconds before next insert if it was actually inserted
+        except sqlite3.IntegrityError:
+            print(f"⚠️ Incident with id={inc['incident_id']} already exists, skipping.")

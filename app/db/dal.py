@@ -42,8 +42,8 @@ def record_incident(
     service: str,
     environment: str,
     severity: str,
-    payload: Dict[str, Any] | None = None,
-    created_at: str | None = None,
+    payload: Optional[Dict[str, Any]] = None,
+    created_at: Optional[str] = None,
 ) -> str:
     """Insert a new incident and return its id (must be provided)."""
     with _conn() as con:

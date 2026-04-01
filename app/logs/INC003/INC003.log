@@ -1,0 +1,3 @@
+2025-09-27T15:10:00Z ERROR [orders] Deadlock detected: transaction 123 waiting for 456, transaction 456 waiting for 123
+2025-09-27T15:10:05Z ERROR [orders] Cascade failure in order-processing service
+2025-09-27T15:10:10Z ERROR [orders] Circuit breaker open for fraud-detection service
