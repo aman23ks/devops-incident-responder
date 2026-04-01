@@ -4,7 +4,7 @@ import boto3
 from botocore.exceptions import ClientError, NoCredentialsError, EndpointConnectionError
 from openai import OpenAI
 from dotenv import load_dotenv
-from langchain.agents import tool
+from langchain_core.tools import tool
 from pinecone import Pinecone
 from app.db.dal import record_step, update_step_status, save_report
 
