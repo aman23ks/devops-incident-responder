@@ -10,9 +10,6 @@ from app.db.dal import record_step, update_step_status, save_report
 
 load_dotenv()
 
-# ---- Clients ----
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
 # Initialize Pinecone only if API key is present
 pc = None
 INDEX_NAME = os.getenv("PINECONE_INDEX_NAME")
@@ -21,6 +18,8 @@ if os.getenv("PINECONE_API_KEY"):
 
 # ---- Helpers ----
 def get_embedding(text: str, model: str = "text-embedding-3-small") -> list[float]:
+    # Initialize OpenAI client lazily to prevent import crashes if the API key isn't provided or is invalidly set as an env var.
+    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     resp = client.embeddings.create(model=model, input=text)
     return resp.data[0].embedding
 
