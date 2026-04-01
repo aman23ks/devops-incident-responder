@@ -153,3 +153,10 @@ def mark_done(incident_id: int) -> None:
 def mark_failed(incident_id: int) -> None:
     with _conn() as con:
         con.execute("UPDATE incidents SET status='FAILED' WHERE id=?", (incident_id,))
+
+def reset_database() -> None:
+    """Clear all data from all tables to reset the MVP demo."""
+    with _conn() as con:
+        con.execute("DELETE FROM reports;")
+        con.execute("DELETE FROM agent_steps;")
+        con.execute("DELETE FROM incidents;")

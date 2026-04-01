@@ -9,9 +9,21 @@ from app.db.dal import (
     get_incident,
     list_steps,
     get_latest_report,
+    reset_database,
 )
+from scripts.seed_incidents import seed_all
 
 st.set_page_config(page_title="Incident Responder", layout="wide")
+
+with st.sidebar:
+    st.header("Admin")
+    if st.button("🔄 Reset MVP Demo", type="primary", use_container_width=True):
+        with st.spinner("Deleting database and injecting fresh incidents..."):
+            reset_database()
+            seed_all()
+        st.success("Demo reset successful!")
+        time.sleep(1)
+        st.rerun()
 st.title("🔧 DevOps Incident Responder — MVP")
 
 REFRESH_INTERVAL = 5  # seconds

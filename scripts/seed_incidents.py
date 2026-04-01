@@ -34,7 +34,8 @@ incidents = [
 
 import sqlite3
 
-if __name__ == "__main__":
+def seed_all():
+    """Seed the baseline incidents, ignoring if they already exist."""
     for inc in incidents:
         try:
             incident_id = record_incident(
@@ -47,6 +48,9 @@ if __name__ == "__main__":
                 created_at=inc["created_at"]
             )
             print(f"✅ Inserted incident with id={incident_id}")
-            time.sleep(5)  # wait 5 seconds before next insert if it was actually inserted
+            time.sleep(2)  # fast insertion for the demo reset
         except sqlite3.IntegrityError:
             print(f"⚠️ Incident with id={inc['incident_id']} already exists, skipping.")
+
+if __name__ == "__main__":
+    seed_all()
