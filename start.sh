@@ -22,4 +22,4 @@ echo "Starting backend agent runner..."
 python app/runner.py &
 
 echo "Starting Streamlit UI..."
-streamlit run ui/streamlit_app.py --server.port=8501 --server.address=0.0.0.0
+streamlit run ui/streamlit_app.py --server.port="${PORT:-8501}" --server.address=0.0.0.0
